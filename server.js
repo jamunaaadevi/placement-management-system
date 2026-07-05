@@ -9,7 +9,7 @@ const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const driveRoutes = require('./routes/driveRoutes');
 const applicationRoutes = require('./routes/applicationRoutes');
-const statsRoutes = require('./routes/statsRoutes');  // ADD THIS
+  
 
 const app = express();
 
@@ -22,7 +22,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/drives', driveRoutes);
 app.use('/api/applications', applicationRoutes);
-app.use('/api/stats', statsRoutes);  // ADD THIS
+ 
 
 // Test route
 app.get('/', (req, res) => {
