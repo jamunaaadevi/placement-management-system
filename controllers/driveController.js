@@ -55,8 +55,20 @@ const createDrive = async (req, res) => {
 };
 
 // Get all upcoming drives
+// Get all upcoming drives
 const getAllDrives = async (req, res) => {
     try {
+        // Pagination params (defaults: page 1, 10 per page)
+        const page = Math.max(parseInt(req.query.page) || 1, 1);
+        const limit = Math.max(parseInt(req.query.limit) || 10, 1);
+        const offset = (page - 1) * limit;
+
+        // Total count (for total pages, without LIMIT)
+        const [countResult] = await db.query(
+            `SELECT COUNT(*) as total FROM Drives WHERE status = 'UPCOMING'`
+        );
+        const total = countResult[0].total;
+
         const [drives] = await db.query(
             `SELECT 
                 d.drive_id,
@@ -78,12 +90,17 @@ const getAllDrives = async (req, res) => {
             LEFT JOIN DriveEligibleDepts ded ON d.drive_id = ded.drive_id
             WHERE d.status = 'UPCOMING'
             GROUP BY d.drive_id
-            ORDER BY d.application_deadline ASC`
+            ORDER BY d.application_deadline ASC
+            LIMIT ? OFFSET ?`,
+            [limit, offset]
         );
 
         res.status(200).json({
             success: true,
             count: drives.length,
+            total,
+            page,
+            totalPages: Math.ceil(total / limit),
             drives: drives
         });
 
@@ -95,7 +112,6 @@ const getAllDrives = async (req, res) => {
         });
     }
 };
-
 // Get eligible drives for logged-in student
 const getEligibleDrives = async (req, res) => {
     try {
