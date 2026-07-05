@@ -33,11 +33,12 @@ const createDrive = async (req, res) => {
         const driveId = result.insertId;
 
         // 3. Insert eligible departments
-        const deptValues = eligible_departments.map(dept => [driveId, dept]);
+        const deptValues = [...new Set(eligible_departments)].map(dept => [driveId, dept]);
         await db.query(
             'INSERT INTO DriveEligibleDepts (drive_id, department) VALUES ?',
             [deptValues]
         );
+        
 
         res.status(201).json({
             success: true,
